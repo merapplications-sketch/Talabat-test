@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Talabat — Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6f8;color:#333;padding:28px 14px 30px}
+.w{max-width:900px;margin:0 auto}
+.top{background:#1a202c;color:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.k{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px;text-align:center}.k b{font-size:21px;color:#ff5a00;display:block}.k span{font-size:11px;color:#718096}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+h3{font-size:15px;margin:14px 0 10px;color:#1a202c}
+.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;scrollbar-width:none}
+.chip{flex-shrink:0;background:#e2e8f0;border:0;border-radius:16px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#4a5568}.chip.on{background:#ff5a00;color:#fff}
+.b{border:0;border-radius:8px;padding:8px 12px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;background:#27ae60}.b.r{background:#e74c3c}
+.s{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:#edf2f7}
+.s.pending{background:#fef3c7;color:#b45309}.s.preparing,.s.ready{background:#dbeafe;color:#1d4ed8}.s.pickedup{background:#e9d5ff;color:#7e22ce}.s.delivered{background:#dcfce7;color:#15803d}.s.rejected,.s.cancelled{background:#fee2e2;color:#b91c1c}
+small{color:#718096}
+</style></head><body><div class="w" id="app"></div>
+<script src="talabat-core.js"></script>
+<script>
+TLB.addDict({aT:'Панель администратора',aOrd:'Заказов',aRev:'Оборот (доставлено)',aAct:'В работе',aRate:'Доля доставленных',aLive:'Заказы',aStores:'Магазины',aDrv:'Курьеры',aAll:'Все',aNo:'Заказов нет',aItems:'позиций',aMenu:'блюд в меню',aOpen:'Открыт',aClosed:'Закрыт',aDel:'доставок',aRes:'Сбросить все демо-данные',aConf:'Удалить все заказы и меню?',aNoD:'Курьеры ещё не брали заказы',aNote:'Демо: доступ без входа. Авторизация и роли — на этапе Supabase.',aTip:'чаевые'},
+{aT:'Admin dashboard',aOrd:'Orders',aRev:'Revenue (delivered)',aAct:'In progress',aRate:'Delivered rate',aLive:'Orders',aStores:'Stores',aDrv:'Couriers',aAll:'All',aNo:'No orders',aItems:'items',aMenu:'menu items',aOpen:'Open',aClosed:'Closed',aDel:'deliveries',aRes:'Reset all demo data',aConf:'Delete all orders and menus?',aNoD:'No courier has taken orders yet',aNote:'Demo: no login. Auth and roles come with Supabase.',aTip:'tips'});
+const t=TLB.t,esc=TLB.esc,$=id=>document.getElementById(id);
+let f='all';
+const ST=['pending','preparing','ready','pickedup','delivered','rejected','cancelled'];
+const fmt=ts=>new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+function wipe(){if(confirm(t('aConf')))TLB.reset()}
+function render(){
+  const all=TLB.orders(),del=all.filter(o=>o.status=='delivered'),act=all.filter(o=>['pending','preparing','ready','pickedup'].includes(o.status));
+  const rev=del.reduce((s,o)=>s+o.total,0),rate=all.length?Math.round(del.length/all.length*100):0;
+  const shown=all.filter(o=>f=='all'||o.status==f);
+  const menus=TLB.allMenus(),drv={};del.forEach(o=>{const d=drv[o.driver]||(drv[o.driver]={name:o.driverName,n:0,sum:0});d.n++;d.sum+=o.payout});
+  $('app').innerHTML=`<div class="top"><b style="font-size:17px">👑 ${t('aT')}</b><br><small style="color:#a0aec0">${t('aNote')}</small></div>
+  <div class="grid"><div class="k"><b>${all.length}</b><span>${t('aOrd')}</span></div><div class="k"><b>${rev} TJS</b><span>${t('aRev')}</span></div><div class="k"><b>${act.length}</b><span>${t('aAct')}</span></div><div class="k"><b>${rate}%</b><span>${t('aRate')}</span></div></div>
+  <h3>${t('aLive')}</h3><div class="chips">${['all',...ST].map(s=>`<button class="chip ${f==s?'on':''}" onclick="f='${s}';render()">${s=='all'?t('aAll'):t(s)}</button>`).join('')}</div>
+  ${shown.length?shown.map(o=>`<div class="card"><div class="row"><b>#${o.id} — ${esc(o.store)}</b><span class="s ${o.status}">${t(o.status)}</span></div>
+  <div class="row" style="margin-top:6px"><small>${fmt(o.createdAt)} • ${esc(o.client.name)} • ${o.items.reduce((s,i)=>s+i.qty,0)} ${t('aItems')}</small><b style="color:#ff5a00">${o.total} TJS</b></div>
+  <small>🛵 ${o.driver?esc(o.driverName):'—'} • ${esc(o.payment)}</small></div>`).join(''):`<div class="card">${t('aNo')}</div>`}
+  <h3>${t('aStores')}</h3>${Object.keys(menus).map(s=>{const o=TLB.isOpen(s);return `<div class="card row"><div><b>${esc(s)}</b><br><small>${menus[s].length} ${t('aMenu')}</small></div><button class="b ${o?'':'r'}" onclick="TLB.setOpen(${JSON.stringify(s).replace(/"/g,'&quot;')},${!o})">${o?'🟢 '+t('aOpen'):'🔴 '+t('aClosed')}</button></div>`}).join('')}
+  <h3>${t('aDrv')}</h3>${Object.keys(drv).length?Object.values(drv).map(d=>`<div class="card row"><b>🛵 ${esc(d.name)}</b><span>${d.n} ${t('aDel')} • ${d.sum.toFixed(2)} TJS</span></div>`).join(''):`<div class="card">${t('aNoD')}</div>`}
+  <button class="b r" style="width:100%;padding:12px;margin-top:8px" onclick="wipe()">${t('aRes')}</button>`}
+TLB.on(render);render();
+</script></body></html>
