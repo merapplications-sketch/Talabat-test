@@ -26,21 +26,21 @@ body{font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;bac
 .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;display:flex;padding-bottom:env(safe-area-inset-bottom)}
 .nav div{flex:1;text-align:center;padding:9px 0;font-size:11px;font-weight:600;color:#718096;cursor:pointer}.nav .on{color:#ff5a00}.nav span{display:block;font-size:19px}
 </style></head><body><div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="talabat-core.js"></script>
 <script>
 TLB.addDict({dOrders:'Заказы',dHist:'История',dMe:'Профиль',newO:'Новые заказы',offl:'Вы не в сети. Включите «На линии».',busy:'У вас есть активный заказ. Новые заказы скрыты до завершения.',noO:'Нет доступных заказов. Ожидание…',pick:'Забрать',drop:'Доставить',take:'Принять заказ 🚀',actO:'Активный заказ',call:'📞 Звонок',chatB:'💬 Чат',q1:'🚪 Я у дома',q2:'⏳ Задерживаюсь',q3:'📍 Где адрес?',q1t:'Я подъезжаю к дому 🚪',q2t:'Задерживаюсь в пути ⏳',q3t:'Не могу найти адрес 📍',map:'🗺️ Открыть карту',wait:'Ждите: заказ ещё готовится',gotIt:'Заказ забран из ресторана 📦',dlv:'Заказ доставлен ✅',st1:'1. Езжайте в ресторан',st2:'2. Доставьте заказ клиенту',bal:'Заработок',cnt:'Выполнено заказов',noH:'История пуста',trans:'Не удалось: проверьте статус заказа'},
 {dOrders:'Orders',dHist:'History',dMe:'Profile',newO:'New orders',offl:'You are offline. Switch to “Online”.',busy:'You have an active order. New orders are hidden until it is finished.',noO:'No orders available. Waiting…',pick:'Pick up',drop:'Deliver',take:'Accept order 🚀',actO:'Active order',call:'📞 Call',chatB:'💬 Chat',q1:'🚪 I am at the door',q2:'⏳ Running late',q3:'📍 Where is the address?',q1t:'I am arriving at your door 🚪',q2t:'Running late ⏳',q3t:'I cannot find the address 📍',map:'🗺️ Open map',wait:'Wait: the order is still being prepared',gotIt:'Order picked up 📦',dlv:'Order delivered ✅',st1:'1. Go to the restaurant',st2:'2. Deliver to the customer',bal:'Earnings',cnt:'Orders completed',noH:'No history yet',trans:'Failed: check the order status'});
 const t=TLB.t,esc=TLB.esc,$=id=>document.getElementById(id);
-const Q=new URLSearchParams(location.search).get('id')||'1';   /* driver.html?id=2 = second driver for testing */
-const DRV=Q=='2'?{id:'DRV-8843',name:'Фарход Юсупов'}:{id:'DRV-8842',name:'Бахром Садыков'};
+let DRV=null;
 let tab='o',online=true,chatOpen=false,lastN=-1;
 const mine=()=>TLB.orders(o=>o.driver==DRV.id&&['preparing','ready','pickedup'].includes(o.status))[0]||null;
 const done=()=>TLB.orders(o=>o.driver==DRV.id&&o.status=='delivered');
 function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();[0,.4].forEach(d=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.2,c.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d+.3);o.connect(g);g.connect(c.destination);o.start(c.currentTime+d);o.stop(c.currentTime+d+.3)})}catch(e){}}
 const setTab=x=>{tab=x;render()};
 const flip=()=>{online=!online;render()};
-function take(id){const r=TLB.driverAccept(id,DRV);if(r.error)alert(t('err_taken'))}
-function step(id,s){const r=TLB.setStatus(id,s);if(r.error)alert(t('trans'))}
+async function take(id){const r=await TLB.driverAccept(id);if(r.error)alert(t('err_'+r.error))}
+async function step(id,s){const r=await TLB.setStatus(id,s);if(r.error)alert(t('trans'))}
 function say(id,txt){chatOpen=true;TLB.chat(id,'driver',txt)}
 const map=q=>`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q+' Душанбе')}`;
 function vOrders(){const a=mine(),of=TLB.offers();let h=`<h3>${t('newO')}</h3>`;
@@ -63,13 +63,13 @@ function vOrders(){const a=mine(),of=TLB.offers();let h=`<h3>${t('newO')}</h3>`;
 function vHist(){const l=done();return `<h3>${t('dHist')}</h3>${l.length?l.map(o=>`<div class="card"><div class="row"><b>#${o.id} (${esc(o.store)})</b><b style="color:#27ae60">${o.payout.toFixed(2)} TJS</b></div><p style="font-size:12px;color:#718096;margin-top:4px">🕒 ${new Date(o.doneAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p></div>`).join(''):`<div class="card">${t('noH')}</div>`}`}
 function vMe(){const l=done(),sum=l.reduce((s,o)=>s+o.payout,0);
   return `<div class="earn"><small>${t('bal')}</small><b>${sum.toFixed(2)} TJS</b><div class="row"><div><b style="font-size:20px;margin:0">${l.length}</b><small>${t('cnt')}</small></div><div><b style="font-size:20px;margin:0">4.9 ★</b><small>Rating</small></div></div></div>
-  <div class="card" style="text-align:center;background:#2d3748;color:#fff"><div style="font-size:38px">🛵</div><b>Yamaha Crypton 110cc</b><p style="font-size:11px;opacity:.8">34-12 RT 01 • ${DRV.id}</p></div>`}
+  <div class="card" style="text-align:center;background:#2d3748;color:#fff"><div style="font-size:38px">🛵</div><b>Yamaha Crypton 110cc</b><p style="font-size:11px;opacity:.8">34-12 RT 01 • #${DRV.id.slice(0,6)}</p></div>`}
 function render(){
   const of=TLB.offers().length;if(online&&!mine()&&lastN>=0&&of>lastN)beep();lastN=of;
-  $('app').innerHTML=`<div class="hd"><div class="row"><div class="av">🚴‍♂️</div><div><b>${esc(DRV.name)}</b><div style="font-size:11px;opacity:.7">${DRV.id} • Душанбе</div></div></div>
+  $('app').innerHTML=`<div class="hd"><div class="row"><div class="av">🚴‍♂️</div><div><b>${esc(DRV.name)}</b><div style="font-size:11px;opacity:.7">#${DRV.id.slice(0,6)} • Душанбе</div></div></div>
   <div class="pill" onclick="flip()"><span class="dot ${online?'':'off'}"></span>${online?t('online'):t('offline')}</div></div>
   <div class="pg">${{o:vOrders,h:vHist,m:vMe}[tab]()}</div>
   <div class="nav">${[['o','📦','dOrders'],['h','📜','dHist'],['m','👤','dMe']].map(x=>`<div class="${tab==x[0]?'on':''}" onclick="setTab('${x[0]}')"><span>${x[1]}</span>${t(x[2])}</div>`).join('')}</div>`;
   const ch=$('ch');if(ch)ch.scrollTop=ch.scrollHeight}
-TLB.on(render);render();
+TLB.start('driver',me=>{DRV=me;TLB.on(render);render()});
 </script></body></html>

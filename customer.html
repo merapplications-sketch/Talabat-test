@@ -6,6 +6,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6f8;color:#333;padding-bottom:130px}
 .hd{background:#ff5a00;color:#fff;padding:26px 15px 15px;border-radius:0 0 20px 20px}
+.hd input{margin-top:12px;border:0;border-radius:12px;padding:12px 14px;font-size:14px}.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 15px 0}.ct{background:#fff;border:1px solid #edf2f7;border-radius:14px;padding:11px 2px;text-align:center;font-size:11px;font-weight:700;cursor:pointer}.ct i{display:block;font-style:normal;font-size:26px;margin-bottom:3px}.ct.on{border-color:#ff5a00;background:#fff3ed;color:#ff5a00}
 .hd small{font-size:11px;opacity:.9}.hd b{display:block;font-size:15px;margin-top:2px}
 .pg{padding:15px}h2{font-size:17px;margin-bottom:12px;color:#1a202c}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 15px 0;scrollbar-width:none}
@@ -34,24 +35,17 @@ input[type=text]{width:100%;padding:11px 13px;border:1px solid #cbd5e1;border-ra
 .tip{flex:1;text-align:center;border:1px solid #cbd5e1;border-radius:8px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer}.tip.on{border-color:#ff5a00;background:#fff3ed;color:#ff5a00}
 </style></head><body>
 <div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="talabat-core.js"></script>
 <script>
-TLB.addDict({home:'Главная',orders:'Заказы',me:'Профиль',deliverTo:'ДОСТАВКА В',all:'Все',rest:'Рестораны',grocery:'Продукты',pharmacy:'Аптеки',beauty:'Красота',flowers:'Цветы',sweets:'Сладости',noMenu:'Меню скоро появится',closed:'Закрыто',addBtn:'Добавить',cartEmpty:'Корзина пуста',sub:'Подытог',deliv:'Доставка',disc:'Скидка',tip:'Чаевые курьеру',total:'Итого',promo:'Промокод',apply:'Применить',promoBad:'Неверный промокод',payM:'Способ оплаты',apple:'Apple Pay',card:'Карта Alif',cash:'Наличными курьеру',place:'Оплатить заказ',noOrders:'Заказов пока нет',track:'Отслеживать',back:'Назад',courier:'Курьер',cancelO:'Отменить заказ',chatH:'Сообщение курьеру',send:'Отправить',langL:'Язык',none:'Нет',s_pending:'Ожидание',s_preparing:'Готовится',s_pickedup:'В пути',s_delivered:'Доставлено',cartT:'Корзина',addr:'Адрес доставки',note:'Демо: данные хранятся в браузере'},
-{home:'Home',orders:'Orders',me:'Profile',deliverTo:'DELIVER TO',all:'All',rest:'Restaurants',grocery:'Groceries',pharmacy:'Pharmacy',beauty:'Beauty',flowers:'Flowers',sweets:'Sweets',noMenu:'Menu coming soon',closed:'Closed',addBtn:'Add',cartEmpty:'Your cart is empty',sub:'Subtotal',deliv:'Delivery',disc:'Discount',tip:'Courier tip',total:'Total',promo:'Promo code',apply:'Apply',promoBad:'Invalid promo code',payM:'Payment method',apple:'Apple Pay',card:'Alif card',cash:'Cash to courier',place:'Pay for order',noOrders:'No orders yet',track:'Track',back:'Back',courier:'Courier',cancelO:'Cancel order',chatH:'Message courier',send:'Send',langL:'Language',none:'None',s_pending:'Waiting',s_preparing:'Preparing',s_pickedup:'On the way',s_delivered:'Delivered',cartT:'Cart',addr:'Delivery address',note:'Demo: data is stored in this browser'});
+TLB.addDict({home:'Главная',orders:'Заказы',me:'Профиль',deliverTo:'ДОСТАВКА В',all:'Все',rest:'Рестораны',grocery:'Продукты',pharmacy:'Аптеки',beauty:'Красота',flowers:'Цветы',sweets:'Сладости',gifts:'Подарки',free:'Бесплатно',shops:'Магазины',search:'Поиск ресторанов, товаров, блюд…',noRes:'Ничего не найдено',noMenu:'Меню скоро появится',closed:'Закрыто',addBtn:'Добавить',cartEmpty:'Корзина пуста',sub:'Подытог',deliv:'Доставка',disc:'Скидка',tip:'Чаевые курьеру',total:'Итого',promo:'Промокод',apply:'Применить',promoBad:'Неверный промокод',payM:'Способ оплаты',apple:'Apple Pay',card:'Карта Alif',cash:'Наличными курьеру',place:'Оплатить заказ',noOrders:'Заказов пока нет',track:'Отслеживать',back:'Назад',courier:'Курьер',cancelO:'Отменить заказ',chatH:'Сообщение курьеру',send:'Отправить',langL:'Язык',none:'Нет',s_pending:'Ожидание',s_preparing:'Готовится',s_pickedup:'В пути',s_delivered:'Доставлено',cartT:'Корзина',addr:'Адрес доставки',note:'Тестовая версия'},
+{home:'Home',orders:'Orders',me:'Profile',deliverTo:'DELIVER TO',all:'All',rest:'Restaurants',grocery:'Groceries',pharmacy:'Pharmacy',beauty:'Beauty',flowers:'Flowers',sweets:'Sweets',gifts:'Gifts',free:'Free',shops:'Shops',search:'Search restaurants, products, dishes…',noRes:'Nothing found',noMenu:'Menu coming soon',closed:'Closed',addBtn:'Add',cartEmpty:'Your cart is empty',sub:'Subtotal',deliv:'Delivery',disc:'Discount',tip:'Courier tip',total:'Total',promo:'Promo code',apply:'Apply',promoBad:'Invalid promo code',payM:'Payment method',apple:'Apple Pay',card:'Alif card',cash:'Cash to courier',place:'Pay for order',noOrders:'No orders yet',track:'Track',back:'Back',courier:'Courier',cancelO:'Cancel order',chatH:'Message courier',send:'Send',langL:'Language',none:'None',s_pending:'Waiting',s_preparing:'Preparing',s_pickedup:'On the way',s_delivered:'Delivered',cartT:'Cart',addr:'Delivery address',note:'Test version'});
 const t=TLB.t,esc=TLB.esc,$=id=>document.getElementById(id);
 const U=i=>`https://images.unsplash.com/${i}?w=500`;
-const STORES=[
-{n:'Romant Restaurant',c:'rest',d:'Local & European',r:'4.9',tm:'20-30',p:'-40%',i:'photo-1517248135467-4c7edcad34c4'},
-{n:'Burger King Dushanbe',c:'rest',d:'Fast Food • Burgers',r:'4.7',tm:'15-25',p:'-50%',i:'photo-1561758033-d89a9ad46330'},
-{n:'Carrefour Mart',c:'grocery',d:'Supermarket & Fresh Food',r:'4.8',tm:'25-40',p:'-20%',i:'photo-1542838132-92c53300491e'},
-{n:"Аптека 'Aibolit'",c:'pharmacy',d:'Medicines & Health 24/7',r:'4.9',tm:'15-25',p:'0 TJS',i:'photo-1584308666744-24d5c474f2ae'},
-{n:'Viva Market',c:'grocery',d:'Groceries & Household',r:'4.6',tm:'20-35',p:'-15%',i:'photo-1578916171728-46686eac8d58'},
-{n:'Sephora Dushanbe',c:'beauty',d:'Cosmetics & Perfumes',r:'4.9',tm:'30-45',p:'Gift',i:'photo-1522337360788-8b13dee7a37e'},
-{n:'Gulistan Flowers',c:'flowers',d:'Fresh Bouquets & Roses',r:'5.0',tm:'25-35',p:'-25%',i:'photo-1563245372-f21724e3856d'},
-{n:'Ширин (Sweets)',c:'sweets',d:'Cakes, Pastries & Desserts',r:'4.8',tm:'20-30',p:'-30%',i:'photo-1578985545062-69928b1d9587'}];
-const PROMO={TALABAT20:['f',20],WELCOME50:['f',50],PROMO10:['p',10]}; /* preview only: the server recalculates */
-const ME={name:'Парвиз Рахимов',phone:'+992921234567'};
-let S={v:'home',cat:'all',store:'',cart:{},promo:'',tip:0,pay:'apple',tid:null,bad:false};
+let STORES=[];
+const syncStores=()=>{STORES=TLB.stores().map(x=>({n:x.name,c:x.category,d:x.description||'',i:x.cover_url||'',p:+x.discount_pct>0?'-'+x.discount_pct+'%':'',ft:x.fee_type,fee:x.fee_type=='free'?0:+x.fee_base,disc:+x.discount_pct}))};
+let ME={name:'',phone:''};
+let S={v:'home',cat:'all',q:'',store:'',cart:{},promo:'',tip:0,pay:'apple',tid:null,bad:false};
 const menuOf=n=>TLB.allMenus(false)[n]||[];
 const go=(v,x)=>{Object.assign(S,{v},x||{});render();scrollTo(0,0)};
 const setCat=c=>{S.cat=c;render()};
@@ -60,39 +54,38 @@ function add(id,d){S.cart[id]=(S.cart[id]||0)+d;if(S.cart[id]<=0)delete S.cart[i
 function addFrom(id){ /* one store per cart */
   if(Object.keys(S.cart).length&&S.cartStore!==S.store){if(!confirm(t('clear_cart')))return;S.cart={}}
   S.cartStore=S.store;add(id,1)}
-function calc(){const m=menuOf(S.cartStore);let sub=0;
+function calc(){const m=menuOf(S.cartStore),st=STORES.find(x=>x.n==S.cartStore)||{fee:10,disc:0};let sub=0;
   for(const id in S.cart){const it=m.find(x=>x.id==id);if(it)sub+=it.price*S.cart[id]}
-  const p=PROMO[S.promo];let d=p?(p[0]=='f'?p[1]:Math.round(sub*p[1]/100)):0;d=Math.min(d,sub);
-  return{sub,d,total:Math.max(5,sub-d+(sub?10:0)+S.tip)}}
-function applyPromo(){const v=$('pc').value.trim().toUpperCase();if(PROMO[v]){S.promo=v;S.bad=false}else{S.promo='';S.bad=true}render()}
-function place(){
-  const r=TLB.placeOrder({store:S.cartStore,cart:S.cart,promo:S.promo,tip:S.tip,payment:t(S.pay),address:'Проспект Рудаки, д. 12, кв. 4',client:ME});
+  const d=Math.round(sub*st.disc)/100,fee=sub?st.fee:0;return{sub,d,fee,total:Math.max(5,sub-d+fee+S.tip)}}
+async function place(){
+  const r=await TLB.placeOrder({store:S.cartStore,cart:S.cart,tip:S.tip,payment:t(S.pay),address:'Проспект Рудаки, д. 12, кв. 4'});
   if(r.error){alert(t('err_'+r.error));return}
-  S.cart={};S.promo='';S.tip=0;go('track',{tid:r.id})}
+  S.cart={};S.tip=0;go('track',{tid:r.id})}
 function cancelO(){if(confirm(t('confirm_cancel'))){TLB.setStatus(S.tid,'cancelled');go('orders')}}
-function sendChat(){const v=$('ci').value.trim();if(v)TLB.chat(S.tid,'client',v)}
+function sendChat(){const e=$('ci'),v=e.value.trim();if(!v)return;e.value='';TLB.chat(S.tid,'client',v)}
 const cartCount=()=>Object.values(S.cart).reduce((a,b)=>a+b,0);
 
-function vHome(){const cats=['all','rest','grocery','pharmacy','beauty','flowers','sweets'];
-  return `<div class="hd"><small>${t('deliverTo')}</small><b>📍 Проспект Рудаки, 12</b></div>
-  <div class="chips">${cats.map(c=>`<div class="chip ${S.cat==c?'on':''}" onclick="setCat('${c}')">${t(c)}</div>`).join('')}</div>
-  <div class="pg">${STORES.map((s,i)=>S.cat=='all'||S.cat==s.c?`<div class="card st" onclick="openStore(${i})"><img src="${U(s.i)}" alt=""><div>
-   <div class="row"><b>${esc(s.n)}</b>${TLB.isOpen(s.n)?`<span class="tag">${s.p}</span>`:`<span class="tag x">${t('closed')}</span>`}</div>
-   <p>${esc(s.d)}</p><p>★ ${s.r} • 🕒 ${s.tm} ${'min'} • 🚴 10 TJS</p></div></div>`:'').join('')}</div>`}
+function vHome(){const cats=['rest','grocery','pharmacy','beauty','flowers','gifts','shops','sweets'],ic={rest:'🍔',grocery:'🛒',pharmacy:'💊',beauty:'💄',flowers:'💐',gifts:'🎁',shops:'🛍️',sweets:'🍰'};
+  const q=S.q.trim().toLowerCase(),M=TLB.allMenus(true);
+  const list=STORES.map(s=>({s,h:q&&(M[s.n]||[]).find(i=>i.name.toLowerCase().includes(q))})).filter(({s,h})=>q?(s.n.toLowerCase().includes(q)||s.d.toLowerCase().includes(q)||h):(S.cat=='all'||S.cat==s.c));
+  return `<div class="hd"><small>${t('deliverTo')}</small><b>📍 Проспект Рудаки, 12</b><input type="text" id="sq" placeholder="🔍 ${t('search')}" value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
+  <div class="cats">${cats.map(c=>`<div class="ct ${S.cat==c&&!q?'on':''}" onclick="S.q='';setCat(S.cat=='${c}'?'all':'${c}')"><i>${ic[c]}</i>${t(c)}</div>`).join('')}</div>
+  <div class="pg">${list.length?list.map(({s,h})=>`<div class="card st" onclick="openStore(${STORES.indexOf(s)})"><img src="${esc(s.i)}" alt=""><div>
+   <div class="row"><b>${esc(s.n)}</b>${TLB.isOpen(s.n)?(s.p?`<span class="tag">${s.p}</span>`:''):`<span class="tag x">${t('closed')}</span>`}</div>
+   <p>${esc(s.d)}</p>${h?`<p style="color:#ff5a00">🍽 ${esc(h.name)} — ${h.price} TJS</p>`:''}<p>🚴 ${s.ft=='free'?t('free'):s.fee+' TJS'}</p></div></div>`).join(''):`<div class="card">${t('noRes')}</div>`}</div>`}
 function vMenu(){const m=TLB.allMenus(true)[S.store]||[],open=TLB.isOpen(S.store);
   return `<div class="pg"><button class="btn g" onclick="go('home')">← ${t('back')}</button><h2 style="margin-top:14px">${esc(S.store)} ${open?'':`<span class="tag x">${t('closed')}</span>`}</h2>
   ${m.length?m.map(i=>{const q=S.cartStore==S.store&&S.cart[i.id]||0;return `<div class="card it row"><img src="${esc(i.image)}" alt=""><div class="i"><b>${esc(i.name)}</b>${i.popular?' 🌟':''}<div class="pr">${i.price} TJS</div></div>
-   ${q?`<div class="qty"><button onclick="add(${i.id},-1)">−</button><span>${q}</span><button onclick="add(${i.id},1)">+</button></div>`:`<button class="btn" onclick="addFrom(${i.id})">${t('addBtn')}</button>`}</div>`}).join(''):`<div class="card">${t('noMenu')}</div>`}</div>`}
+   ${q?`<div class="qty"><button onclick="add('${i.id}',-1)">−</button><span>${q}</span><button onclick="add('${i.id}',1)">+</button></div>`:`<button class="btn" onclick="addFrom('${i.id}')">${t('addBtn')}</button>`}</div>`}).join(''):`<div class="card">${t('noMenu')}</div>`}</div>`}
 function vCart(){const m=menuOf(S.cartStore),c=calc(),ids=Object.keys(S.cart);
   if(!ids.length)return `<div class="pg"><h2>${t('cartT')}</h2><div class="card">${t('cartEmpty')}</div></div>`;
   return `<div class="pg"><h2>${t('cartT')} — ${esc(S.cartStore)}</h2>
-  ${ids.map(id=>{const i=m.find(x=>x.id==id)||{name:'?',price:0};return `<div class="card row"><div><b>${esc(i.name)}</b><div class="pr">${i.price} TJS</div></div><div class="qty"><button onclick="add(${id},-1)">−</button><span>${S.cart[id]}</span><button onclick="add(${id},1)">+</button></div></div>`}).join('')}
-  <div class="card"><div class="row"><input type="text" id="pc" placeholder="${t('promo')}" value="${esc(S.promo)}"><button class="btn" onclick="applyPromo()">${t('apply')}</button></div>${S.bad?`<p style="color:#e74c3c;font-size:12px;margin-top:6px">${t('promoBad')}</p>`:''}</div>
-  <div class="card"><b>${t('tip')}</b><div class="row" style="margin-top:8px">${[0,3,5,10].map(v=>`<div class="tip ${S.tip==v?'on':''}" onclick="S.tip=${v};render()">${v?v+' TJS':t('none')}</div>`).join('')}</div></div>
+  ${ids.map(id=>{const i=m.find(x=>x.id==id)||{name:'?',price:0};return `<div class="card row"><div><b>${esc(i.name)}</b><div class="pr">${i.price} TJS</div></div><div class="qty"><button onclick="add('${id}',-1)">−</button><span>${S.cart[id]}</span><button onclick="add('${id}',1)">+</button></div></div>`}).join('')}
+    <div class="card"><b>${t('tip')}</b><div class="row" style="margin-top:8px">${[0,3,5,10].map(v=>`<div class="tip ${S.tip==v?'on':''}" onclick="S.tip=${v};render()">${v?v+' TJS':t('none')}</div>`).join('')}</div></div>
   <div class="card"><b>${t('payM')}</b>${['apple','card','cash'].map(p=>`<div class="row" style="padding:9px 0" onclick="S.pay='${p}';render()"><span>${t(p)}</span><input type="radio" ${S.pay==p?'checked':''}></div>`).join('')}</div>
-  <div class="card"><div class="row"><span>${t('sub')}</span><span>${c.sub} TJS</span></div><div class="row"><span>${t('disc')}</span><span style="color:#27ae60">−${c.d} TJS</span></div><div class="row"><span>${t('deliv')}</span><span>10 TJS</span></div>
+  <div class="card"><div class="row"><span>${t('sub')}</span><span>${c.sub} TJS</span></div><div class="row"><span>${t('disc')}</span><span style="color:#27ae60">−${c.d} TJS</span></div><div class="row"><span>${t('deliv')}</span><span>${c.fee} TJS</span></div>
   <div class="row" style="font-size:17px;font-weight:800;margin:10px 0"><span>${t('total')}</span><span class="pr">${c.total} TJS</span></div><button class="btn big" onclick="place()">${t('place')}</button></div></div>`}
-function vOrders(){const l=TLB.orders(o=>o.client.phone==ME.phone);
+function vOrders(){const l=TLB.orders();
   return `<div class="pg"><h2>${t('orders')}</h2>${l.length?l.map(o=>`<div class="card" onclick="go('track',{tid:${o.id}})"><div class="row"><b>#${o.id} — ${esc(o.store)}</b><span class="pr">${o.total} TJS</span></div><p style="font-size:12px;color:#ff5a00;margin-top:4px">${t(o.status)}</p></div>`).join(''):`<div class="card">${t('noOrders')}</div>`}</div>`}
 function vTrack(){const o=TLB.order(S.tid);if(!o)return vOrders();
   const n={pending:0,preparing:1,ready:1,pickedup:2,delivered:3}[o.status],dead=o.status=='rejected'||o.status=='cancelled';
@@ -109,9 +102,9 @@ function render(){
   const V={home:vHome,menu:vMenu,cart:vCart,orders:vOrders,track:vTrack,me:vMe}[S.v]();
   const nav=['home','orders','me'],ic={home:'🏠',orders:'📦',me:'👤'};
   const bar=cartCount()&&(S.v=='home'||S.v=='menu')?`<div class="bar" onclick="go('cart')"><span>🛒 ${t('cartT')} (${cartCount()})</span><span>${calc().total} TJS</span></div>`:'';
-  const a=document.activeElement,keep=a&&a.id=='ci'?a.value:null;
+  const a=document.activeElement,kid=a&&(a.id=='ci'||a.id=='sq')?a.id:null,keep=kid?a.value:null;
   $('app').innerHTML=V+bar+`<div class="nav">${nav.map(k=>`<div class="${S.v==k||(k=='orders'&&S.v=='track')?'on':''}" onclick="go('${k}')"><span>${ic[k]}</span>${t(k)}</div>`).join('')}</div>`;
-  if(keep!==null&&$('ci')){$('ci').value=keep;$('ci').focus()}
+  if(kid&&$(kid)){const e=$(kid);e.value=keep;e.focus();e.setSelectionRange(keep.length,keep.length)}
   const ch=$('ch');if(ch)ch.scrollTop=ch.scrollHeight}
-TLB.on(render);render();
+TLB.start('customer',me=>{ME={name:me.name,phone:me.phone};syncStores();TLB.on(()=>{syncStores();render()});render()});
 </script></body></html>
